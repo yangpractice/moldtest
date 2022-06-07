@@ -1,17 +1,15 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas as pd
 plt.style.use('ggplot')
 plt.rcParams['font.family'] = 'DFKai-SB'  # 顯示中文其中包含字體名稱 (for Win10)
 plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
 import chardet
 
-with open('D:/moldtest/burrs_pp_2.csv', 'rb') as f:
+with open('D:/moldtest/burrs_pp_2_2.csv', 'rb') as f:
     enc = chardet.detect(f.read())  # or readline if the file is large
 
-df = pd.read_csv('D:/moldtest/burrs_pp_2.csv', encoding=enc['encoding'])
+df = pd.read_csv('D:/moldtest/burrs_pp_2_2.csv', encoding=enc['encoding'])
 
 # df=df.set_index('Unnamed: 0').reset_index(drop=True)
 df.head(5)
@@ -70,7 +68,7 @@ train_targets = df["輸出"].values
 
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 
-X_train, X_test, Y_train, Y_test = train_test_split(train_data, train_targets, test_size=0.2, random_state=3,
+X_train, X_test, Y_train, Y_test = train_test_split(train_data, train_targets, test_size=0.2, random_state=2,
                                                     shuffle=True)
 
 from sklearn import preprocessing  # 引入所需函式庫

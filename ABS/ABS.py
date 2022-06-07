@@ -8,10 +8,10 @@ plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
 import chardet
 
-with open('D:/moldtest/burrs_pp_2.csv', 'rb') as f:
+with open('D:/moldtest/burrs_abs.csv', 'rb') as f:
     enc = chardet.detect(f.read())  # or readline if the file is large
 
-df = pd.read_csv('D:/moldtest/burrs_pp_2.csv', encoding=enc['encoding'])
+df = pd.read_csv('D:/moldtest/burrs_abs.csv', encoding=enc['encoding'])
 
 # df=df.set_index('Unnamed: 0').reset_index(drop=True)
 df.head(5)
@@ -36,7 +36,7 @@ from keras.utils import np_utils
 labelencoder = LabelEncoder()
 encoder = df
 encoder['輸出'] = labelencoder.fit_transform(encoder['結果'])
-#encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
+encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
 encoder.head(5)
 
 import seaborn as sns
@@ -114,7 +114,6 @@ model = model()
 early_stopping_cb = keras.callbacks.EarlyStopping(monitor='loss', patience=10, restore_best_weights=True)
 
 # 儲存當前訓練參數，tensorboard開啟
-'''
 import os
 
 root_logdir = os.path.join(os.curdir, "my_logs")
@@ -128,7 +127,7 @@ def get_run_logdir():
 
 run_logdir = get_run_logdir()
 tensorboard_cb = keras.callbacks.TensorBoard(run_logdir)
-'''
+
 call = ModelCheckpoint('burr.h5',
                        monitor='loss',
                        verbose=0,
@@ -138,7 +137,7 @@ call = ModelCheckpoint('burr.h5',
                        save_freq=1)
 
 history = model.fit(X_trian_normal_data, Y_train,
-                    callbacks=[call, early_stopping_cb],
+                    callbacks=[call, early_stopping_cb, tensorboard_cb],
                     epochs=250,
                     batch_size=35, verbose=1)
 
@@ -146,7 +145,7 @@ history = model.fit(X_trian_normal_data, Y_train,
 model.save('burr.h5')
 
 pred = model.predict(X_test_normal_data)
-#print('ssss', X_test_normal_data.shape)
+print('ssss', X_test_normal_data.shape)
 
 plot_model(model, show_shapes=True, show_layer_names=False)
 pd.DataFrame(history.history).plot(figsize=(8, 5))
@@ -162,10 +161,9 @@ plt.show()
 '''
 te = X_test_normal_data[0]
 newte = tf.reshape(te, [1, X_test_normal_data.shape[1]])
-#print('te', te)
-#print('newte', newte)
-#print('mmmmm', model(newte)[0][0])
-
+print('te', te)
+print('newte', newte)
+print('mmmmm', model(newte)[0][0])
 accnu = 0
 testanswer = []
 pred_answer = []
@@ -193,7 +191,6 @@ print('pred_answer', pred_answer)
 print('訓練集:', model.evaluate(X_trian_normal_data, Y_train))
 print('測試集:', model.evaluate(X_test_normal_data, Y_test))
 
-
 df_train = pd.DataFrame(X_train)
 
 df_train['輸出'] = Y_train
@@ -202,15 +199,16 @@ df_test = pd.DataFrame(X_test)
 df_test['輸出'] = Y_test  # 0是不會溢料 1是溢料
 #print(df_train)
 #print(df_test)
-ax1=sns.scatterplot(x=df_train["鎖模力%"], y=df_train["射壓峰值2Mpa"],hue=df_train["輸出"])
+
+ax1=sns.scatterplot(x=df_train["鎖模力"], y=df_train["射壓峰值"],hue=df_train["輸出"])
 ax1.set_title('Train Data')
 plt.show()
-ax2=sns.scatterplot(x=df_test["鎖模力%"], y=df_test["射壓峰值2Mpa"],hue=df_test["輸出"])
+ax2=sns.scatterplot(x=df_test["鎖模力"], y=df_test["射壓峰值"],hue=df_test["輸出"])
 ax2.set_title('Test Data')
 plt.show()
 df_pred = pd.DataFrame(X_test)
 df_pred['輸出'] = pred_answer
 #print(df_pred)
-ax3=sns.scatterplot(x=df_pred["鎖模力%"], y=df_pred["射壓峰值2Mpa"],hue=df_pred["輸出"])
+ax3=sns.scatterplot(x=df_pred["鎖模力"], y=df_pred["射壓峰值"],hue=df_pred["輸出"])
 ax3.set_title('Predict Data')
 plt.show()

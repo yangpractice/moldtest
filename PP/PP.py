@@ -8,10 +8,10 @@ plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
 import chardet
 
-with open('D:/moldtest/burrs_ABS_PP_PC.csv', 'rb') as f:
+with open('D:/moldtest/burrs_pp.csv', 'rb') as f:
     enc = chardet.detect(f.read())  # or readline if the file is large
 
-df = pd.read_csv('D:/moldtest/burrs_ABS_PP_PC.csv', encoding=enc['encoding'])
+df = pd.read_csv('D:/moldtest/burrs_pp.csv', encoding=enc['encoding'])
 
 # df=df.set_index('Unnamed: 0').reset_index(drop=True)
 df.head(5)
@@ -93,11 +93,11 @@ from tensorflow.keras.utils import plot_model
 def model():
     # create model
     model = tf.keras.models.Sequential()
-    model.add(layers.Dense(16,
+    model.add(layers.Dense(8,
                            activation="relu",
                            input_shape=(X_train.shape[1],)))
     model.add(Dropout(0.2))
-    model.add(layers.Dense(8,
+    model.add(layers.Dense(16,
                            activation="relu"))
     model.add(Dropout(0.2))
     model.add(layers.Dense(1,
@@ -164,7 +164,7 @@ newte = tf.reshape(te, [1, X_test_normal_data.shape[1]])
 print('te', te)
 print('newte', newte)
 print('mmmmm', model(newte)[0][0])
-print('Y_test', Y_test)
+
 accnu = 0
 testanswer = []
 pred_answer = []
@@ -191,8 +191,7 @@ print('pred_answer', pred_answer)
 
 print('訓練集:', model.evaluate(X_trian_normal_data, Y_train))
 print('測試集:', model.evaluate(X_test_normal_data, Y_test))
-print(Y_test)
-print(pred_answer)
+
 
 df_train = pd.DataFrame(X_train)
 
@@ -200,11 +199,17 @@ df_train['輸出'] = Y_train
 # 建立測試集的 DataFrme
 df_test = pd.DataFrame(X_test)
 df_test['輸出'] = Y_test  # 0是不會溢料 1是溢料
-print(df_train)
-print(df_test)
-sns.lmplot("鎖模力", "射壓峰值", hue='輸出', data=df_train, fit_reg=False)
-sns.lmplot("鎖模力", "射壓峰值", data=df_test, hue="輸出", fit_reg=False)
+#print(df_train)
+#print(df_test)
+ax1=sns.scatterplot(x=df_train["鎖模力"], y=df_train["射壓峰值"],hue=df_train["輸出"])
+ax1.set_title('Train Data')
+plt.show()
+ax2=sns.scatterplot(x=df_test["鎖模力"], y=df_test["射壓峰值"],hue=df_test["輸出"])
+ax2.set_title('Test Data')
+plt.show()
 df_pred = pd.DataFrame(X_test)
 df_pred['輸出'] = pred_answer
-print(df_pred)
-sns.lmplot("鎖模力", "射壓峰值", data=df_pred, hue="輸出", fit_reg=False)
+#print(df_pred)
+ax3=sns.scatterplot(x=df_pred["鎖模力"], y=df_pred["射壓峰值"],hue=df_pred["輸出"])
+ax3.set_title('Predict Data')
+plt.show()

@@ -1,17 +1,15 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas as pd
 plt.style.use('ggplot')
 plt.rcParams['font.family'] = 'DFKai-SB'  # 顯示中文其中包含字體名稱 (for Win10)
 plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
 import chardet
 
-with open('D:/moldtest/burrs_pp_2.csv', 'rb') as f:
+with open('D:/moldtest/burrs_pc_2.csv', 'rb') as f:
     enc = chardet.detect(f.read())  # or readline if the file is large
 
-df = pd.read_csv('D:/moldtest/burrs_pp_2.csv', encoding=enc['encoding'])
+df = pd.read_csv('D:/moldtest/burrs_pc_2.csv', encoding=enc['encoding'])
 
 # df=df.set_index('Unnamed: 0').reset_index(drop=True)
 df.head(5)
@@ -202,15 +200,15 @@ df_test = pd.DataFrame(X_test)
 df_test['輸出'] = Y_test  # 0是不會溢料 1是溢料
 #print(df_train)
 #print(df_test)
-ax1=sns.scatterplot(x=df_train["鎖模力%"], y=df_train["射壓峰值2Mpa"],hue=df_train["輸出"])
+ax1=sns.scatterplot(x=df_train["鎖模力"], y=df_train["射壓峰值"],hue=df_train["輸出"])
 ax1.set_title('Train Data')
 plt.show()
-ax2=sns.scatterplot(x=df_test["鎖模力%"], y=df_test["射壓峰值2Mpa"],hue=df_test["輸出"])
+ax2=sns.scatterplot(x=df_test["鎖模力"], y=df_test["射壓峰值"],hue=df_test["輸出"])
 ax2.set_title('Test Data')
 plt.show()
 df_pred = pd.DataFrame(X_test)
 df_pred['輸出'] = pred_answer
 #print(df_pred)
-ax3=sns.scatterplot(x=df_pred["鎖模力%"], y=df_pred["射壓峰值2Mpa"],hue=df_pred["輸出"])
+ax3=sns.scatterplot(x=df_pred["鎖模力"], y=df_pred["射壓峰值"],hue=df_pred["輸出"])
 ax3.set_title('Predict Data')
 plt.show()

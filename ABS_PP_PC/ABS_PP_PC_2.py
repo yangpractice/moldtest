@@ -1,6 +1,8 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+pd.set_option('display.max_columns', 1000)
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_rows', 1000)
 
 plt.style.use('ggplot')
 plt.rcParams['font.family'] = 'DFKai-SB'  # 顯示中文其中包含字體名稱 (for Win10)
@@ -8,10 +10,10 @@ plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
 import chardet
 
-with open('D:/moldtest/burrs_pp_2.csv', 'rb') as f:
+with open('D:/moldtest/burrs_ABS_PP_PC_2.csv', 'rb') as f:
     enc = chardet.detect(f.read())  # or readline if the file is large
 
-df = pd.read_csv('D:/moldtest/burrs_pp_2.csv', encoding=enc['encoding'])
+df = pd.read_csv('D:/moldtest/burrs_ABS_PP_PC_2.csv', encoding=enc['encoding'])
 
 # df=df.set_index('Unnamed: 0').reset_index(drop=True)
 df.head(5)
@@ -36,7 +38,7 @@ from keras.utils import np_utils
 labelencoder = LabelEncoder()
 encoder = df
 encoder['輸出'] = labelencoder.fit_transform(encoder['結果'])
-#encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
+# encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
 encoder.head(5)
 
 import seaborn as sns
@@ -70,7 +72,7 @@ train_targets = df["輸出"].values
 
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 
-X_train, X_test, Y_train, Y_test = train_test_split(train_data, train_targets, test_size=0.2, random_state=3,
+X_train, X_test, Y_train, Y_test = train_test_split(train_data, train_targets, test_size=0.2, random_state=1,
                                                     shuffle=True)
 
 from sklearn import preprocessing  # 引入所需函式庫
@@ -97,7 +99,7 @@ def model():
                            activation="relu",
                            input_shape=(X_train.shape[1],)))
     model.add(Dropout(0.2))
-    model.add(layers.Dense(16,
+    model.add(layers.Dense(8,
                            activation="relu"))
     model.add(Dropout(0.2))
     model.add(layers.Dense(1,
@@ -140,13 +142,13 @@ call = ModelCheckpoint('burr.h5',
 history = model.fit(X_trian_normal_data, Y_train,
                     callbacks=[call, early_stopping_cb],
                     epochs=250,
-                    batch_size=35, verbose=1)
+                    batch_size=25, verbose=1)
 
 # 儲存模型
 model.save('burr.h5')
 
 pred = model.predict(X_test_normal_data)
-#print('ssss', X_test_normal_data.shape)
+# print('ssss', X_test_normal_data.shape)
 
 plot_model(model, show_shapes=True, show_layer_names=False)
 pd.DataFrame(history.history).plot(figsize=(8, 5))
@@ -162,9 +164,9 @@ plt.show()
 '''
 te = X_test_normal_data[0]
 newte = tf.reshape(te, [1, X_test_normal_data.shape[1]])
-#print('te', te)
-#print('newte', newte)
-#print('mmmmm', model(newte)[0][0])
+# print('te', te)
+# print('newte', newte)
+# print('mmmmm', model(newte)[0][0])
 
 accnu = 0
 testanswer = []
@@ -193,24 +195,23 @@ print('pred_answer', pred_answer)
 print('訓練集:', model.evaluate(X_trian_normal_data, Y_train))
 print('測試集:', model.evaluate(X_test_normal_data, Y_test))
 
-
 df_train = pd.DataFrame(X_train)
 
 df_train['輸出'] = Y_train
 # 建立測試集的 DataFrme
 df_test = pd.DataFrame(X_test)
 df_test['輸出'] = Y_test  # 0是不會溢料 1是溢料
-#print(df_train)
-#print(df_test)
-ax1=sns.scatterplot(x=df_train["鎖模力%"], y=df_train["射壓峰值2Mpa"],hue=df_train["輸出"])
+print(df_train)
+print(df_test)
+ax1 = sns.scatterplot(x=df_train["鎖模力%"], y=df_train["射壓峰值2Mpa"], hue=df_train["輸出"])
 ax1.set_title('Train Data')
 plt.show()
-ax2=sns.scatterplot(x=df_test["鎖模力%"], y=df_test["射壓峰值2Mpa"],hue=df_test["輸出"])
+ax2 = sns.scatterplot(x=df_test["鎖模力%"], y=df_test["射壓峰值2Mpa"], hue=df_test["輸出"])
 ax2.set_title('Test Data')
 plt.show()
 df_pred = pd.DataFrame(X_test)
 df_pred['輸出'] = pred_answer
-#print(df_pred)
-ax3=sns.scatterplot(x=df_pred["鎖模力%"], y=df_pred["射壓峰值2Mpa"],hue=df_pred["輸出"])
+print(df_pred)
+ax3 = sns.scatterplot(x=df_pred["鎖模力%"], y=df_pred["射壓峰值2Mpa"], hue=df_pred["輸出"])
 ax3.set_title('Predict Data')
 plt.show()
