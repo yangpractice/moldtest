@@ -1,42 +1,28 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 plt.style.use('ggplot')
 plt.rcParams['font.family'] = 'DFKai-SB'  # 顯示中文其中包含字體名稱 (for Win10)
 plt.rcParams['axes.unicode_minus'] = False  # 正常顯示負號
 
-import chardet
+import pandas as pd
+from sqlalchemy import create_engine
+# 初始化資料庫連線，使用pymysql模組
+# MySQL的使用者：root, 密碼:147369, 埠：3306,資料庫：mydb
+engine = create_engine('mysql+pymysql://root:cax521@127.0.0.1:3306/moldtest')
+dbConnection= engine.connect()
+df = pd.read_sql_query('SELECT * FROM `burrs_abs`;', dbConnection)
+print(df)
+dbConnection.close()
 
-with open('D:/moldtest/burrs_abs.csv', 'rb') as f:
-    enc = chardet.detect(f.read())  # or readline if the file is large
-
-df = pd.read_csv('D:/moldtest/burrs_abs.csv', encoding=enc['encoding'])
-
-# df=df.set_index('Unnamed: 0').reset_index(drop=True)
-df.head(5)
-
-df.groupby('結果').mean()
-'''
-import seaborn as sns
-import matplotlib.pyplot as plt
-fig,axes=plt.subplots(nrows=1,ncols=4)
-fig.set_size_inches(15,4)
-sns.distplot(df["射出壓力峰值Mpa"][:],ax=axes[0])
-sns.distplot(df["鎖模力%"][:],ax=axes[1])
-sns.distplot(df["射速mm/s"][:],ax=axes[2])
-sns.distplot(df["回饋鎖模力ton"][:],ax=axes[3])
-'''
 X = df.drop(columns=["結果"])
 Y = df["結果"].values
 
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import np_utils
 
 labelencoder = LabelEncoder()
 encoder = df
 encoder['輸出'] = labelencoder.fit_transform(encoder['結果'])
-encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
+#encoder['分類'] = labelencoder.fit_transform(encoder['材料'])
 encoder.head(5)
 
 import seaborn as sns

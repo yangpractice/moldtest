@@ -96,7 +96,7 @@ def model():
                            activation="relu",
                            input_shape=(X_train.shape[1],)))
     model.add(Dropout(0.2))
-    model.add(layers.Dense(8,
+    model.add(layers.Dense(16,
                            activation="relu"))
     model.add(Dropout(0.2))
     model.add(layers.Dense(1,
